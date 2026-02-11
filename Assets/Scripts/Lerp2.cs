@@ -1,9 +1,9 @@
 // UMD IMDM290 
 // Instructor: Myungin Lee
-    // [a <-----------> b]
-    // Lerp : Linearly interpolates between two points. 
-    // https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Vector3.Lerp.html
+// Student: Andrew Hu
 
+
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Lerp2 : MonoBehaviour
@@ -13,7 +13,6 @@ public class Lerp2 : MonoBehaviour
     float time = 0.01f;
     Vector3[] startPosition, endPosition;
 
-    // Start is called before the first frame update
     void Start()
     {
         // Assign proper types and sizes to the variables.
@@ -28,54 +27,41 @@ public class Lerp2 : MonoBehaviour
             startPosition[i] = new Vector3(r * Random.Range(-1f, 1f), r * Random.Range(-1f, 1f), r * Random.Range(-1f, 1f));        
 
             r = 3f; // radius of the heart
-            // Circular end position
             float t = i * 2 * Mathf.PI / numSphere;
             float cos = Mathf.Cos(t);
             float sin = Mathf.Sin(t);
             endPosition[i] = new Vector3(r * Mathf.Sqrt(2) * Mathf.Pow(sin, 3), r * (-Mathf.Pow(cos, 3) - Mathf.Pow(cos, 2) + 2 * cos + 1)  );
         }
+
         // Let there be spheres..
         for (int i =0; i < numSphere; i++){
-            // Draw primitive elements:
-            // https://docs.unity3d.com/6000.0/Documentation/ScriptReference/GameObject.CreatePrimitive.html
             spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere); 
 
-            // Position
             spheres[i].transform.position = startPosition[i];
 
-            // Color. Get the renderer of the spheres and assign colors.
             Renderer sphereRenderer = spheres[i].GetComponent<Renderer>();
-            // HSV color space: https://en.wikipedia.org/wiki/HSL_and_HSV
-            float hue = (float)i / numSphere; // Hue cycles through 0 to 1
-            Color color = Color.HSVToRGB(hue, 1f, 1f); // Full saturation and brightness
+            float hue = (float)i / numSphere;
+            Color color = Color.HSVToRGB(hue, 1f, 1f);
             sphereRenderer.material.color = color;
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Measure Time 
-        time += Time.deltaTime; // Time.deltaTime = The interval in seconds from the last frame to the current one
-        // what to update over time?
+        time += Time.deltaTime;
+
         for (int i = 0; i < numSphere; i++){
-            // Lerp : Linearly interpolates between two points.
-            // https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Vector3.Lerp.html
-            // Vector3.Lerp(startPosition, endPosition, lerpFraction)
-
-            // lerpFraction variable defines the point between startPosition and endPosition (0~1)
-            // let it oscillate over time using sin function
-            //float lerpFraction = Mathf.Pow(Mathf.Cos(time), 3) * 0.5f + 0.5f;
-            float lerpFraction = 1 - Mathf.Clamp(Mathf.Abs(Mathf.Cos(Mathf.Pow(time + 0.5f, 3)) / (time + 0.5f)), 0, 1);
-            // Lerp logic. Update position
-            spheres[i].transform.position = Vector3.Lerp(startPosition[i], endPosition[i], lerpFraction);
-            // For now, start positions and end positions are fixed. But what if you change it over time?
-            // startPosition[i]; endPosition[i];
-
-            // Color Update over time
+            Transform sphere = spheres[i].transform;
             Renderer sphereRenderer = spheres[i].GetComponent<Renderer>();
-            float hue = (float)i / numSphere; // Hue cycles through 0 to 1
-            Color color = Color.HSVToRGB(Mathf.Abs(hue * Mathf.Sin(time)), Mathf.Cos(time), 2f + Mathf.Cos(time)); // Full saturation and brightness
+
+            // Position
+            float lerpFraction = 1 - Mathf.Clamp(Mathf.Abs(Mathf.Cos(time) / (time + 0.5f)), 0, 1);
+
+            sphere.position = Vector3.Lerp(startPosition[i], endPosition[i], lerpFraction);
+
+            // Color
+            float hue = (float)i / numSphere;
+            Color color = Color.HSVToRGB(sphere.position.x/10, sphere.position.y, sphere.position.z); 
             sphereRenderer.material.color = color;
         }
     }
