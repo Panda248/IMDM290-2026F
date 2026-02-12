@@ -6,4 +6,4 @@ Course material repository for IMDM 290 (Unity).
 
 ## Course Media
 Assignment 1: Image over Time
-![Heart Animation Demo](demo.mp4)
+![Heart Animation Demo](demo.gif)
